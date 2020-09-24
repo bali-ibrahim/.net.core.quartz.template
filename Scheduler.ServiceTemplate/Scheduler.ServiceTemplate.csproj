@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Scheduler.Quartz\Scheduler.Quartz.csproj" />
+    <ProjectReference Include="..\AspNetCore.Scheduler.Quartz\AspNetCore.Scheduler.Quartz.csproj" />
   </ItemGroup>
 
 </Project>
