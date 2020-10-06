@@ -5,6 +5,7 @@ using Quartz;
 
 namespace Scheduler.ServiceTemplate
 {
+    [DisallowConcurrentExecution]
     public class HelloWorldJob : IJob
     {
         private readonly ILogger<HelloWorldJob> _logger;
