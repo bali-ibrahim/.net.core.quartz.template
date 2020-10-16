@@ -11,24 +11,22 @@ namespace AspNetCore.Scheduler.Quartz
 {
     public static class QuartzExtensions
     {
-        private static bool _isConfigured;
+        private static QuartzConfig _quartzConfig;
 
-        private static void Configure(this IServiceCollection services)
+        public static void AddQuartz(this IServiceCollection services, IConfigurationSection quartzConfigSection)
         {
             services.AddSingleton<IJobFactory, JobFactory>();
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
             services.AddHostedService<QuartzHostedService>();
-            _isConfigured = true;
+            services.Configure<QuartzConfig>(quartzConfigSection);
+            _quartzConfig = quartzConfigSection.Get<QuartzConfig>();
         }
 
-        private static void LookForJobsIn(this IConfiguration configuration, IServiceCollection services, Assembly asm)
+        private static void LookForJobsIn(this IServiceCollection services, Assembly asm)
         {
-            var appSettingsSection = configuration.GetSection(typeof(Quartz).Name);
-            services.Configure<Quartz>(appSettingsSection);
-            var appSettings = appSettingsSection.Get<Quartz>();
             var types = asm.GetTypes();
             var typeFullNames = types.Select(i => i.FullName);
-            var keys = appSettings.Jobs.Keys.Intersect(typeFullNames);
+            var keys = _quartzConfig.Jobs.Keys.Intersect(typeFullNames);
 
             Console.WriteLine("Jobs below are registered:");
             foreach (var key in keys)
@@ -37,16 +35,14 @@ namespace AspNetCore.Scheduler.Quartz
                 var type = types.Single(t => t.FullName == key);
                 services.AddSingleton(new JobSchedule(
                     jobType: type,
-                    cronExpression: appSettings.Jobs[key])); //every 10 seconds
+                    cronExpression: _quartzConfig.Jobs[key]));
             }
         }
 
-        public static void RegisterJob<T>(this IConfiguration configuration, IServiceCollection services) where T : IJob
+        public static void RegisterJob<T>(this IServiceCollection services) where T : class, IJob
         {
-            if (!_isConfigured) services.Configure();
-            var type = typeof(T);
-            configuration.LookForJobsIn(services, type.Assembly);
-            services.AddSingleton(type);
+            services.LookForJobsIn(typeof(T).Assembly);
+            services.AddSingleton<T>();
         }
     }
 }

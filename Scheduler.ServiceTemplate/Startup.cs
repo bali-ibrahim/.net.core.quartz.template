@@ -24,7 +24,8 @@ namespace Scheduler.ServiceTemplate
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            Configuration.RegisterJob<HelloWorldJob>(services);
+            services.AddQuartz(Configuration.GetSection("Quartz"));
+            services.RegisterJob<HelloWorldJob>();
         }
 
 
