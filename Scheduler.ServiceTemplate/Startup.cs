@@ -26,6 +26,7 @@ namespace Scheduler.ServiceTemplate
         {
             services.AddQuartz(Configuration.GetSection("Quartz"));
             services.RegisterJob<HelloWorldJob>();
+            services.RegisterJob<HelloWorldJob2>();
         }
 
 

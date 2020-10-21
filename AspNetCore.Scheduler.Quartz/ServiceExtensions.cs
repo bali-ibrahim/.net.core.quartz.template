@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -9,7 +8,7 @@ using Quartz.Spi;
 
 namespace AspNetCore.Scheduler.Quartz
 {
-    public static class QuartzExtensions
+    public static class ServiceExtensions
     {
         private static QuartzConfig _quartzConfig;
 
@@ -22,10 +21,12 @@ namespace AspNetCore.Scheduler.Quartz
             _quartzConfig = quartzConfigSection.Get<QuartzConfig>();
         }
 
-        private static void LookForJobsIn(this IServiceCollection services, Assembly asm)
+        private static void LookForJobsIn<T>(this IServiceCollection services)
         {
-            var types = asm.GetTypes();
-            var typeFullNames = types.Select(i => i.FullName);
+            var tType = typeof(T);
+            var jobName = tType.FullName;
+            var types = tType.Assembly.GetTypes();
+            var typeFullNames = types.Select(i => i.FullName).Where(i => i == jobName);
             var keys = _quartzConfig.Jobs.Keys.Intersect(typeFullNames);
 
             Console.WriteLine("Jobs below are registered:");
@@ -41,7 +42,7 @@ namespace AspNetCore.Scheduler.Quartz
 
         public static void RegisterJob<T>(this IServiceCollection services) where T : class, IJob
         {
-            services.LookForJobsIn(typeof(T).Assembly);
+            services.LookForJobsIn<T>();
             services.AddSingleton<T>();
         }
     }
