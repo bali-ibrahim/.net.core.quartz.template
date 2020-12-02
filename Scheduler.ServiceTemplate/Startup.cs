@@ -25,8 +25,8 @@ namespace Scheduler.ServiceTemplate
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddQuartz(Configuration.GetSection("Quartz"));
-            services.RegisterJob<HelloWorldJob>();
-            services.RegisterJob<HelloWorldJob2>();
+            services.AddSingletonJob<HelloWorldJob>();
+            services.AddSingletonJob<HelloWorldJob2>();
         }
 
 

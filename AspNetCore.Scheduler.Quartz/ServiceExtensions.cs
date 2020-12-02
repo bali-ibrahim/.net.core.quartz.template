@@ -21,7 +21,7 @@ namespace AspNetCore.Scheduler.Quartz
             _quartzConfig = quartzConfigSection.Get<QuartzConfig>();
         }
 
-        private static void LookForJobsIn<T>(this IServiceCollection services)
+        private static void AddJobSchedule<T>(this IServiceCollection services)
         {
             var tType = typeof(T);
             var jobName = tType.FullName;
@@ -40,9 +40,25 @@ namespace AspNetCore.Scheduler.Quartz
             }
         }
 
+        [Obsolete("This function is deprecated, please use AddSingletonJob instead.", true)]
         public static void RegisterJob<T>(this IServiceCollection services) where T : class, IJob
         {
-            services.LookForJobsIn<T>();
+            services.AddSingletonJob<T>();
+        }
+        // TODO: research
+        //public static void AddScopedJob<T>(this IServiceCollection services) where T : class, IJob
+        //{
+        //    services.AddJobSchedule<T>();
+        //    services.AddScoped<T>();
+        //}
+        public static void AddTransientJob<T>(this IServiceCollection services) where T : class, IJob
+        {
+            services.AddJobSchedule<T>();
+            services.AddTransient<T>();
+        }
+        public static void AddSingletonJob<T>(this IServiceCollection services) where T : class, IJob
+        {
+            services.AddJobSchedule<T>();
             services.AddSingleton<T>();
         }
     }
