@@ -61,5 +61,32 @@ namespace AspNetCore.Scheduler.Quartz
             services.AddJobSchedule<T>();
             services.AddSingleton<T>();
         }
+        public static void AddExtraneousTransientJobs(this IServiceCollection services)
+        {
+            var keys = _quartzConfig.Jobs.Keys;
+
+            Console.WriteLine("Trying to register jobs:");
+            Array.ForEach(keys.ToArray(), Console.WriteLine);
+            Console.WriteLine();
+            foreach (var key in keys)
+            {
+                var type = Type.GetType(key);
+                if (type == null)
+                {
+                    Console.WriteLine("Could not register!");
+                    Console.WriteLine(key);
+                    Console.WriteLine("Make sure the key is compile time equivalent of");
+                    // https://stackoverflow.com/a/42928892/7032856
+                    //var asd = Type.GetType("Scheduler.ServiceTemplate.HelloWorldJob, NonWebAppTemplate");
+                    Console.WriteLine("string qualifiedName = typeof(YourClass).AssemblyQualifiedName;");
+                    Console.WriteLine();
+                    continue;
+                }
+                services.AddSingleton(new JobSchedule(
+                    jobType: type,
+                    cronExpression: _quartzConfig.Jobs[key]));
+                services.AddTransient(type);
+            }
+        }
     }
 }
