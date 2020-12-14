@@ -33,6 +33,6 @@ namespace NonWebAppTemplate
                 })
 
                 // configuration
-                .ConfigureServices(services => { services.AddTransientJob<HelloWorldJob>(); });
+                .ConfigureServices(services => { services.AddExtraneousTransientJobs(); });
     }
 }
