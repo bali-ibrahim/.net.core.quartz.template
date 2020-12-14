@@ -6,12 +6,13 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/bali-ibrahim/.net.core.quartz.template</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.6</Version>
-    <FileVersion>1.0.0.6</FileVersion>
-    <AssemblyVersion>1.0.0.6</AssemblyVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <SignAssembly>false</SignAssembly>
     <Description>A package for simplifying scheduling Quartz Jobs.</Description>
     <PackageReleaseNotes>Add a feature to schedule jobs from extraneous dlls using services.AddExtraneousTransientJobs();
+- Fix now extraneous dlls can be added as intended
 </PackageReleaseNotes>
   </PropertyGroup>
 

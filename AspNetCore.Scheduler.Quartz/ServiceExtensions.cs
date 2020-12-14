@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -68,17 +69,20 @@ namespace AspNetCore.Scheduler.Quartz
             Console.WriteLine("Trying to register jobs:");
             Array.ForEach(keys.ToArray(), Console.WriteLine);
             Console.WriteLine();
+            Console.WriteLine("Make sure the key is compile time equivalent of");
+            // https://stackoverflow.com/a/42928892/7032856
+            //var asd = Type.GetType("Scheduler.ServiceTemplate.HelloWorldJob, NonWebAppTemplate");
+            Console.WriteLine("string qualifiedName = typeof(YourClass).AssemblyQualifiedName;");
+            Console.WriteLine();
+
             foreach (var key in keys)
             {
+                TryLoadAssembly(key);
                 var type = Type.GetType(key);
                 if (type == null)
                 {
                     Console.WriteLine("Could not register!");
                     Console.WriteLine(key);
-                    Console.WriteLine("Make sure the key is compile time equivalent of");
-                    // https://stackoverflow.com/a/42928892/7032856
-                    //var asd = Type.GetType("Scheduler.ServiceTemplate.HelloWorldJob, NonWebAppTemplate");
-                    Console.WriteLine("string qualifiedName = typeof(YourClass).AssemblyQualifiedName;");
                     Console.WriteLine();
                     continue;
                 }
@@ -86,6 +90,26 @@ namespace AspNetCore.Scheduler.Quartz
                     jobType: type,
                     cronExpression: _quartzConfig.Jobs[key]));
                 services.AddTransient(type);
+            }
+        }
+
+        private static void TryLoadAssembly(string AssemblyQualifiedName)
+        {
+            try
+            {
+                var assembly = AssemblyQualifiedName.Split(",")[1].Trim();
+                if (string.IsNullOrEmpty(assembly)) return;
+
+                var assemblyFileName = assembly + ".dll";
+
+                Console.WriteLine("Loading the assembly:");
+                Console.WriteLine(assemblyFileName);
+                Assembly.LoadFrom(assemblyFileName);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Could not load the assembly.");
+                Console.WriteLine(e);
             }
         }
     }
