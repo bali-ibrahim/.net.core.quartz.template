@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -100,7 +101,8 @@ namespace AspNetCore.Scheduler.Quartz
                 var assembly = AssemblyQualifiedName.Split(",")[1].Trim();
                 if (string.IsNullOrEmpty(assembly)) return;
 
-                var assemblyFileName = assembly + ".dll";
+                var ServiceFolder = Path.IsPathRooted(_quartzConfig.ServiceFolder) ? _quartzConfig.ServiceFolder : $"{AppDomain.CurrentDomain.BaseDirectory}{_quartzConfig.ServiceFolder}";
+                var assemblyFileName = $"{ServiceFolder}{assembly}.dll";
 
                 Console.WriteLine("Loading the assembly:");
                 Console.WriteLine(assemblyFileName);

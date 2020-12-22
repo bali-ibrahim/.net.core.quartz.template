@@ -5,14 +5,14 @@
     <Authors>Ibrahim Bali</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/bali-ibrahim/.net.core.quartz.template</RepositoryUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
-    <FileVersion>1.1.0.0</FileVersion>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>1.2.0</Version>
+    <FileVersion>1.1.1.0</FileVersion>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
     <SignAssembly>false</SignAssembly>
-    <Description>A package for simplifying scheduling Quartz Jobs.</Description>
-    <PackageReleaseNotes>Add a feature to schedule jobs from extraneous dlls using services.AddExtraneousTransientJobs();
-- Fix now extraneous dlls can be added as intended
+    <Description>Simplify scheduling Quartz Jobs using configuration file.</Description>
+    <PackageReleaseNotes>- can now specify extraneous dlls folder under Quartz config with "ServiceFolder"
+- ServiceFolder should support both absolute and relative paths, should also work cross platform
 </PackageReleaseNotes>
   </PropertyGroup>
 
