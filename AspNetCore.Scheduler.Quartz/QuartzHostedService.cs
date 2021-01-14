@@ -51,9 +51,9 @@ namespace AspNetCore.Scheduler.Quartz
         {
             return TriggerBuilder
                 .Create()
-                .WithIdentity($"{schedule.JobType.FullName}.trigger")
+                //.WithIdentity($"{schedule.JobType.FullName}.trigger")
                 .WithCronSchedule(schedule.CronExpression)
-                .WithDescription(schedule.CronExpression)
+                //.WithDescription(schedule.CronExpression)
                 .Build();
         }
 
@@ -62,8 +62,8 @@ namespace AspNetCore.Scheduler.Quartz
             var jobType = schedule.JobType;
             return JobBuilder
                 .Create(jobType)
-                .WithIdentity(jobType.FullName)
-                .WithDescription(jobType.Name)
+                //.WithIdentity(jobType.FullName)
+                //.WithDescription(jobType.Name)
                 .Build();
         }
     }

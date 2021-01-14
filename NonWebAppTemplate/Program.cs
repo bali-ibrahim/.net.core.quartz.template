@@ -1,7 +1,6 @@
 using AspNetCore.Scheduler.Quartz;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Scheduler.ServiceTemplate;
 
 namespace NonWebAppTemplate
 {
@@ -9,15 +8,8 @@ namespace NonWebAppTemplate
     {
         public static int Main(string[] args)
         {
-            try
-            {
-                CreateHostBuilder(args).Build().Run();
-                return 0;
-            }
-            catch
-            {
-                return 1;
-            }
+            CreateHostBuilder(args).Build().Run();
+            return 0;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

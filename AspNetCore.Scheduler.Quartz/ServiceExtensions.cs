@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using AspNetCore.Scheduler.Quartz.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -12,15 +14,15 @@ namespace AspNetCore.Scheduler.Quartz
 {
     public static class ServiceExtensions
     {
-        private static QuartzConfig _quartzConfig;
+        private static Configurations.Quartz _quartzConfig;
 
         public static void AddQuartz(this IServiceCollection services, IConfigurationSection quartzConfigSection)
         {
             services.AddSingleton<IJobFactory, JobFactory>();
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
             services.AddHostedService<QuartzHostedService>();
-            services.Configure<QuartzConfig>(quartzConfigSection);
-            _quartzConfig = quartzConfigSection.Get<QuartzConfig>();
+            services.Configure<Configurations.Quartz>(quartzConfigSection);
+            _quartzConfig = quartzConfigSection.Get<Configurations.Quartz>();
         }
 
         private static void AddJobSchedule<T>(this IServiceCollection services)
@@ -29,16 +31,21 @@ namespace AspNetCore.Scheduler.Quartz
             var jobName = tType.FullName;
             var types = tType.Assembly.GetTypes();
             var typeFullNames = types.Select(i => i.FullName).Where(i => i == jobName);
-            var keys = _quartzConfig.Jobs.Keys.Intersect(typeFullNames);
+            //var keys = _quartzConfig.Jobs.Keys.Intersect(typeFullNames);
+            var triggers = _quartzConfig.Triggers.Where(t => t.Value.Select(j => j.ClassFullName).Intersect(typeFullNames).Any());
 
             Console.WriteLine("Jobs below are registered:");
-            foreach (var key in keys)
+            foreach (var trigger in triggers)
             {
-                Console.WriteLine($"\t{key}");
-                var type = types.Single(t => t.FullName == key);
-                services.AddSingleton(new JobSchedule(
-                    jobType: type,
-                    cronExpression: _quartzConfig.Jobs[key]));
+                Console.WriteLine($"\t{trigger}");
+                foreach (var job in trigger.Value)
+                {
+                    Console.WriteLine($"\t{job}");
+                    var type = types.Single(t => t.FullName == job.ClassFullName);
+                    services.AddSingleton(new JobSchedule(
+                        jobType: type,
+                        cronExpression: trigger.Key));
+                }
             }
         }
 
@@ -65,53 +72,52 @@ namespace AspNetCore.Scheduler.Quartz
         }
         public static void AddExtraneousTransientJobs(this IServiceCollection services)
         {
-            var keys = _quartzConfig.Jobs.Keys;
-
-            Console.WriteLine("Trying to register jobs:");
-            Array.ForEach(keys.ToArray(), Console.WriteLine);
-            Console.WriteLine();
-            Console.WriteLine("Make sure the key is compile time equivalent of");
-            // https://stackoverflow.com/a/42928892/7032856
-            //var asd = Type.GetType("Scheduler.ServiceTemplate.HelloWorldJob, NonWebAppTemplate");
-            Console.WriteLine("string qualifiedName = typeof(YourClass).AssemblyQualifiedName;");
-            Console.WriteLine();
-
-            foreach (var key in keys)
+            foreach (var trigger in _quartzConfig.Triggers)
             {
-                TryLoadAssembly(key);
-                var type = Type.GetType(key);
-                if (type == null)
+                foreach (var job in trigger.Value)
                 {
-                    Console.WriteLine("Could not register!");
-                    Console.WriteLine(key);
-                    Console.WriteLine();
-                    continue;
+                    var jobSerialized = JsonSerializer.Serialize(job);
+                    Console.WriteLine("Adding the job:");
+                    Console.WriteLine(jobSerialized);
+                    var assembly = TryLoadAssembly(job);
+                    //var type = Type.GetType(job.ClassFullName);
+                    var type = assembly.GetType(job.ClassFullName);
+                    if (type == null)
+                    {
+                        Console.WriteLine("Could not register!");
+                        Console.WriteLine(job.ClassFullName);
+                        Console.WriteLine();
+                        continue;
+                    }
+                    services.AddSingleton(new JobSchedule(
+                        jobType: type,
+                        cronExpression: trigger.Key));
+                    services.AddTransient(type);
+
                 }
-                services.AddSingleton(new JobSchedule(
-                    jobType: type,
-                    cronExpression: _quartzConfig.Jobs[key]));
-                services.AddTransient(type);
             }
         }
 
-        private static void TryLoadAssembly(string AssemblyQualifiedName)
+        private static Assembly TryLoadAssembly(Job job)
         {
             try
             {
-                var assembly = AssemblyQualifiedName.Split(",")[1].Trim();
-                if (string.IsNullOrEmpty(assembly)) return;
+                if (string.IsNullOrEmpty(job.AssemblyFilename)) throw new Exception("Could not find AssemblyName.");
 
-                var ServiceFolder = Path.IsPathRooted(_quartzConfig.ServiceFolder) ? _quartzConfig.ServiceFolder : $"{AppDomain.CurrentDomain.BaseDirectory}{_quartzConfig.ServiceFolder}";
-                var assemblyFileName = $"{ServiceFolder}{assembly}.dll";
+                var ServiceFolder = Path.IsPathRooted(job.AssemblyDirectory) ? job.AssemblyDirectory : $"{AppDomain.CurrentDomain.BaseDirectory}{job.AssemblyDirectory}";
+                var assemblyFileName = $"{ServiceFolder}{job.AssemblyFilename}";
 
                 Console.WriteLine("Loading the assembly:");
                 Console.WriteLine(assemblyFileName);
-                Assembly.LoadFrom(assemblyFileName);
+                var assembly = Assembly.LoadFrom(assemblyFileName);
+                Console.WriteLine("Success!");
+                return assembly;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Could not load the assembly.");
+                Console.WriteLine($"Failure: Could not load the assembly.");
                 Console.WriteLine(e);
+                return null;
             }
         }
     }
