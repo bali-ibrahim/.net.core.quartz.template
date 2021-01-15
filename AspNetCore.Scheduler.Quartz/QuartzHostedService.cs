@@ -60,11 +60,13 @@ namespace AspNetCore.Scheduler.Quartz
         private static IJobDetail CreateJob(JobSchedule schedule)
         {
             var jobType = schedule.JobType;
-            return JobBuilder
+            var jobDetailDefault = JobBuilder
                 .Create(jobType)
-                //.WithIdentity(jobType.FullName)
-                //.WithDescription(jobType.Name)
-                .Build();
+                .Build()
+                ;
+            jobDetailDefault.Key.Group = jobType.FullName;
+            var jobDetail = jobDetailDefault.GetJobBuilder().Build();
+            return jobDetail;
         }
     }
 }
