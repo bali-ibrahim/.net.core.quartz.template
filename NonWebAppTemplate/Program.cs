@@ -8,7 +8,9 @@ namespace NonWebAppTemplate
     {
         public static int Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build()
+            .RunRegisteredJobOnStartAsync()
+            .Run();
             return 0;
         }
 
@@ -25,6 +27,7 @@ namespace NonWebAppTemplate
                 })
 
                 // configuration
-                .ConfigureServices(services => { services.AddExtraneousTransientJobs(); });
+                .ConfigureServices(services => { services.AddExtraneousTransientJobs(); })
+                ;
     }
 }

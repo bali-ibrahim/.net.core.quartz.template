@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading.Tasks;
 using AspNetCore.Scheduler.Quartz.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
@@ -119,6 +122,37 @@ namespace AspNetCore.Scheduler.Quartz
                 Console.WriteLine(e);
                 return null;
             }
+        }
+
+        public static IHost RunRegisteredJobOnStartAsync(this IHost host)
+        {
+            Console.WriteLine("Started running registered jobs on start!");
+            var types = new List<Type>();
+            var ti = typeof(IJob);
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var t in asm.GetTypes())
+                {
+                    if (ti.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract)
+                    {
+                        types.Add(t);
+                    }
+                }
+            }
+            var serviceTypes = host.Services.GetServices<JobSchedule>().Select(s => s.JobType).Where(s => types.Contains(s));
+            var tasks = new List<Task>();
+            foreach (var serviceType in serviceTypes)
+            {
+                var services = host.Services.GetServices(serviceType);
+                foreach (var service in services)
+                {
+                    var job = (IJob)service;
+                    tasks.Add(job.Execute(null));
+                }
+            }
+            Task.WaitAll(tasks.ToArray());
+            Console.WriteLine("End running registered jobs on start!");
+            return host;
         }
     }
 }
