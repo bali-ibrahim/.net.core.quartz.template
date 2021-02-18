@@ -123,8 +123,7 @@ namespace AspNetCore.Scheduler.Quartz
                 return null;
             }
         }
-
-        public static IHost RunRegisteredJobOnStartAsync(this IHost host)
+        public static async Task RunRegisteredJobOnStartAsync(this IHost host)
         {
             Console.WriteLine("Started running registered jobs on start!");
             var types = new List<Type>();
@@ -150,8 +149,13 @@ namespace AspNetCore.Scheduler.Quartz
                     tasks.Add(job.Execute(null));
                 }
             }
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks.ToArray());
             Console.WriteLine("End running registered jobs on start!");
+        }
+
+        public static IHost RunRegisteredJobsBeforeRun(this IHost host)
+        {
+            RunRegisteredJobOnStartAsync(host).Wait();
             return host;
         }
     }
