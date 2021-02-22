@@ -138,7 +138,7 @@ namespace AspNetCore.Scheduler.Quartz
                     }
                 }
             }
-            var serviceTypes = host.Services.GetServices<JobSchedule>().Select(s => s.JobType).Where(s => types.Contains(s));
+            var serviceTypes = host.Services.GetServices<JobSchedule>().Select(s => s.JobType).Distinct().Where(s => types.Contains(s));
             var tasks = new List<Task>();
             foreach (var serviceType in serviceTypes)
             {
