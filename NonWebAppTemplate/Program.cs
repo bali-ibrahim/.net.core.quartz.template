@@ -9,7 +9,7 @@ namespace NonWebAppTemplate
         public static int Main(string[] args)
         {
             CreateHostBuilder(args).Build()
-            .RunRegisteredJobOnStartAsync()
+            .RunRegisteredJobsOnStartAsync()
             .Run();
             return 0;
         }
