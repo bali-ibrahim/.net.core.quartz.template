@@ -40,10 +40,10 @@ namespace AspNetCore.Scheduler.Quartz
             Console.WriteLine("Jobs below are registered:");
             foreach (var trigger in triggers)
             {
-                Console.WriteLine($"\t{trigger}");
+                Console.WriteLine(JsonSerializer.Serialize(trigger));
                 foreach (var job in trigger.Value)
                 {
-                    Console.WriteLine($"\t{job}");
+                    Console.WriteLine(JsonSerializer.Serialize(job));
                     var type = types.Single(t => t.FullName == job.ClassFullName);
                     services.AddSingleton(new JobSchedule(
                         jobType: type,
