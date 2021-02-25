@@ -155,7 +155,7 @@ namespace AspNetCore.Scheduler.Quartz
 
         public static IHost RunRegisteredJobsBeforeRun(this IHost host)
         {
-            host.RunRegisteredJobsOnStartAsync().GetAwaiter().GETre
+            host.RunRegisteredJobsOnStartAsync().GetAwaiter().GetResult();
             return host;
         }
     }
