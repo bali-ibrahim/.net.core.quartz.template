@@ -6,12 +6,12 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/bali-ibrahim/.net.core.quartz.template</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.3.4</Version>
-    <FileVersion>1.3.0.4</FileVersion>
-    <AssemblyVersion>1.3.0.4</AssemblyVersion>
+    <Version>1.3.5</Version>
+    <FileVersion>1.3.0.5</FileVersion>
+    <AssemblyVersion>1.3.0.5</AssemblyVersion>
     <SignAssembly>false</SignAssembly>
     <Description>Simplify scheduling Quartz Jobs using configuration file.</Description>
-    <PackageReleaseNotes>- fix: make on startup service calls distinct</PackageReleaseNotes>
+    <PackageReleaseNotes>- refactor: rename RunRegisteredJobOnStartAsync to RunRegisteredJobsOnStartAsync</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
