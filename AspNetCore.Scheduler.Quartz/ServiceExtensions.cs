@@ -123,7 +123,8 @@ namespace AspNetCore.Scheduler.Quartz
                 return null;
             }
         }
-        public static async Task RunRegisteredJobsOnStartAsync(this IHost host)
+
+        public static async Task RunRegisteredJobsOnStartAsync(this IServiceProvider serviceProvider)
         {
             Console.WriteLine("Started running registered jobs on start!");
             var types = new List<Type>();
@@ -138,11 +139,11 @@ namespace AspNetCore.Scheduler.Quartz
                     }
                 }
             }
-            var serviceTypes = host.Services.GetServices<JobSchedule>().Select(s => s.JobType).Distinct().Where(s => types.Contains(s));
+            var serviceTypes = serviceProvider.GetServices<JobSchedule>().Select(s => s.JobType).Distinct().Where(s => types.Contains(s));
             var tasks = new List<Task>();
             foreach (var serviceType in serviceTypes)
             {
-                var services = host.Services.GetServices(serviceType);
+                var services = serviceProvider.GetServices(serviceType);
                 foreach (var service in services)
                 {
                     var job = (IJob)service;
@@ -152,7 +153,10 @@ namespace AspNetCore.Scheduler.Quartz
             await Task.WhenAll(tasks.ToArray());
             Console.WriteLine("End running registered jobs on start!");
         }
-
+        public static async Task RunRegisteredJobsOnStartAsync(this IHost host)
+        {
+            await host.Services.RunRegisteredJobsOnStartAsync();
+        }
         public static IHost RunRegisteredJobsBeforeRun(this IHost host)
         {
             host.RunRegisteredJobsOnStartAsync().GetAwaiter().GetResult();
