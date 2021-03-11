@@ -65,35 +65,18 @@ namespace AspNetCore.Scheduler.Quartz
         //    services.AddJobSchedule<T>();
         //    services.AddScoped<T>();
         //}
-        [Obsolete("This function is deprecated, it acts the same as the overload with false.", true)]
-        public static void AddTransientJob<T>(this IServiceCollection services) where T : class, IJob
-        {
-            services.AddJobSchedule<T>(false);
-            services.AddTransient<T>();
-        }
-        [Obsolete("This function is deprecated, it acts the same as the overload with false.", true)]
-        public static void AddSingletonJob<T>(this IServiceCollection services) where T : class, IJob
-        {
-            services.AddJobSchedule<T>(false);
-            services.AddSingleton<T>();
-        }
-        public static void AddTransientJob<T>(this IServiceCollection services, bool runOnceAtStartup) where T : class, IJob
+        public static void AddTransientJob<T>(this IServiceCollection services, bool runOnceAtStartup = false) where T : class, IJob
         {
             services.AddJobSchedule<T>(runOnceAtStartup);
             services.AddTransient<T>();
         }
-        public static void AddSingletonJob<T>(this IServiceCollection services, bool runOnceAtStartup) where T : class, IJob
+        public static void AddSingletonJob<T>(this IServiceCollection services, bool runOnceAtStartup = false) where T : class, IJob
         {
             services.AddJobSchedule<T>(runOnceAtStartup);
             services.AddSingleton<T>();
         }
 
-        [Obsolete("This function is deprecated, it acts the same as the overload with false.", true)]
-        public static void AddExtraneousTransientJobs(this IServiceCollection services)
-        {
-            services.AddExtraneousTransientJobs(false);
-        }
-        public static void AddExtraneousTransientJobs(this IServiceCollection services, bool runOnceAtStartup)
+        public static void AddExtraneousTransientJobs(this IServiceCollection services, bool runOnceAtStartup = false)
         {
             foreach (var trigger in _quartzConfig.Triggers)
             {

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using AspNetCore.Scheduler.Quartz;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -6,11 +7,10 @@ namespace NonWebAppTemplate
 {
     public class Program
     {
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
-            CreateHostBuilder(args).Build()
-            .RunRegisteredJobsOnStartAsync()
-            .Run();
+            var host = CreateHostBuilder(args).Build();
+            await host.RunAsync();
             return 0;
         }
 
