@@ -28,7 +28,7 @@ namespace AspNetCore.Scheduler.Quartz
             _quartzConfig = quartzConfigSection.Get<Configurations.Quartz>();
         }
 
-        private static void AddJobSchedule<T>(this IServiceCollection services)
+        private static void AddJobSchedule<T>(this IServiceCollection services, bool runOnceAtStartup)
         {
             var tType = typeof(T);
             var jobName = tType.FullName;
@@ -48,14 +48,16 @@ namespace AspNetCore.Scheduler.Quartz
                     services.AddSingleton(new JobSchedule(
                         jobType: type,
                         cronExpression: trigger.Key));
+                    if (runOnceAtStartup)
+                    {
+                        services.AddSingleton(new JobSchedule(
+                            jobType: type,
+                            // empty schedules single trigger once
+                            cronExpression: string.Empty));
+                    }
+
                 }
             }
-        }
-
-        [Obsolete("This function is deprecated, please use AddSingletonJob instead.", true)]
-        public static void RegisterJob<T>(this IServiceCollection services) where T : class, IJob
-        {
-            services.AddSingletonJob<T>();
         }
         // TODO: research
         //public static void AddScopedJob<T>(this IServiceCollection services) where T : class, IJob
@@ -63,17 +65,35 @@ namespace AspNetCore.Scheduler.Quartz
         //    services.AddJobSchedule<T>();
         //    services.AddScoped<T>();
         //}
+        [Obsolete("This function is deprecated, it acts the same as the overload with false.", true)]
         public static void AddTransientJob<T>(this IServiceCollection services) where T : class, IJob
         {
-            services.AddJobSchedule<T>();
+            services.AddJobSchedule<T>(false);
             services.AddTransient<T>();
         }
+        [Obsolete("This function is deprecated, it acts the same as the overload with false.", true)]
         public static void AddSingletonJob<T>(this IServiceCollection services) where T : class, IJob
         {
-            services.AddJobSchedule<T>();
+            services.AddJobSchedule<T>(false);
             services.AddSingleton<T>();
         }
+        public static void AddTransientJob<T>(this IServiceCollection services, bool runOnceAtStartup) where T : class, IJob
+        {
+            services.AddJobSchedule<T>(runOnceAtStartup);
+            services.AddTransient<T>();
+        }
+        public static void AddSingletonJob<T>(this IServiceCollection services, bool runOnceAtStartup) where T : class, IJob
+        {
+            services.AddJobSchedule<T>(runOnceAtStartup);
+            services.AddSingleton<T>();
+        }
+
+        [Obsolete("This function is deprecated, it acts the same as the overload with false.", true)]
         public static void AddExtraneousTransientJobs(this IServiceCollection services)
+        {
+            services.AddExtraneousTransientJobs(false);
+        }
+        public static void AddExtraneousTransientJobs(this IServiceCollection services, bool runOnceAtStartup)
         {
             foreach (var trigger in _quartzConfig.Triggers)
             {
@@ -95,12 +115,26 @@ namespace AspNetCore.Scheduler.Quartz
                     services.AddSingleton(new JobSchedule(
                         jobType: type,
                         cronExpression: trigger.Key));
+                    if (runOnceAtStartup)
+                    {
+                        services.AddSingleton(new JobSchedule(
+                            jobType: type,
+                            // empty schedules single trigger once
+                            cronExpression: string.Empty));
+                    }
                     services.AddTransient(type);
 
                 }
             }
         }
-
+        public static TriggerBuilder WithCronScheduleNowIfEmpty(this TriggerBuilder triggerBuilder, string cronExpression)
+        {
+            if (string.IsNullOrWhiteSpace(cronExpression))
+            {
+                return triggerBuilder.StartNow();
+            }
+            return triggerBuilder.WithCronSchedule(cronExpression);
+        }
         private static Assembly TryLoadAssembly(Job job)
         {
             try

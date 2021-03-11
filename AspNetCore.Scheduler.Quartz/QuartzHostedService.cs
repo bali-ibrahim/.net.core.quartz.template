@@ -25,7 +25,6 @@ namespace AspNetCore.Scheduler.Quartz
 
         public IScheduler Scheduler { get; set; }
 
-
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             Scheduler = await _schedulerFactory.GetScheduler(cancellationToken);
@@ -49,14 +48,15 @@ namespace AspNetCore.Scheduler.Quartz
 
         private static ITrigger CreateTrigger(JobSchedule schedule)
         {
+            var test = TriggerBuilder.Create();
             return TriggerBuilder
                 .Create()
                 //.WithIdentity($"{schedule.JobType.FullName}.trigger")
-                .WithCronSchedule(schedule.CronExpression)
+                .WithCronScheduleNowIfEmpty(schedule.CronExpression)
                 //.WithDescription(schedule.CronExpression)
-                .Build();
+                .Build()
+                ;
         }
-
         private static IJobDetail CreateJob(JobSchedule schedule)
         {
             var jobType = schedule.JobType;
