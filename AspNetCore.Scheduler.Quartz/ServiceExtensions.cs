@@ -41,7 +41,7 @@ namespace AspNetCore.Scheduler.Quartz
             foreach (var trigger in triggers)
             {
                 Console.WriteLine(JsonSerializer.Serialize(trigger));
-                foreach (var job in trigger.Value)
+                foreach (var job in trigger.Value.Where(t => t.ClassFullName == jobName))
                 {
                     Console.WriteLine(JsonSerializer.Serialize(job));
                     var type = types.Single(t => t.FullName == job.ClassFullName);

@@ -6,12 +6,12 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/bali-ibrahim/.net.core.quartz.template</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.3.11</Version>
-    <FileVersion>1.3.0.11</FileVersion>
-    <AssemblyVersion>1.3.0.11</AssemblyVersion>
+    <Version>1.3.12</Version>
+    <FileVersion>1.3.0.12</FileVersion>
+    <AssemblyVersion>1.3.0.12</AssemblyVersion>
     <SignAssembly>false</SignAssembly>
     <Description>Simplify scheduling Quartz Jobs using configuration file.</Description>
-    <PackageReleaseNotes>- refactor</PackageReleaseNotes>
+    <PackageReleaseNotes>- fix: a bug where schedules might be duplicated</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

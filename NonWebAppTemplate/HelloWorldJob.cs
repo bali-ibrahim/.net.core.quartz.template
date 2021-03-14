@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace Scheduler.ServiceTemplate
+namespace NonWebAppTemplate
 {
     [DisallowConcurrentExecution]
     public class HelloWorldJob : IJob
