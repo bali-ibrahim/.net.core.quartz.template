@@ -6,6 +6,7 @@ namespace AspNetCore.Scheduler.Quartz
     {
         public JobSchedule(Type jobType, string cronExpression)
         {
+            var asd = new DummyJob();
             JobType = jobType;
             CronExpression = cronExpression;
         }
