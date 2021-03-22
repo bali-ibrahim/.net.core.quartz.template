@@ -78,7 +78,8 @@ namespace AspNetCore.Scheduler.Quartz
 
         public static void AddExtraneousTransientJobs(this IServiceCollection services, bool runOnceAtStartup = false)
         {
-            foreach (var trigger in _quartzConfig.Triggers)
+            if (_quartzConfig == null) return;
+            foreach (var trigger in _quartzConfig?.Triggers)
             {
                 foreach (var job in trigger.Value)
                 {
