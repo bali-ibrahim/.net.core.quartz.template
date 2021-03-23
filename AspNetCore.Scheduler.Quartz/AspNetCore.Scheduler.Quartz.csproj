@@ -6,12 +6,12 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/bali-ibrahim/.net.core.quartz.template</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.3.14</Version>
-    <FileVersion>1.3.0.14</FileVersion>
-    <AssemblyVersion>1.3.0.14</AssemblyVersion>
+    <Version>1.3.15</Version>
+    <FileVersion>1.3.0.15</FileVersion>
+    <AssemblyVersion>1.3.0.15</AssemblyVersion>
     <SignAssembly>false</SignAssembly>
     <Description>Simplify scheduling Quartz Jobs using configuration file.</Description>
-    <PackageReleaseNotes>- decision: allow null config for extraneous jobs</PackageReleaseNotes>
+    <PackageReleaseNotes>- fix: stop assuming logger exists when triggering dummy job</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

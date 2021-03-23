@@ -18,17 +18,29 @@ namespace AspNetCore.Scheduler.Quartz
 
         public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
         {
+            IJob job;
             // https://stackoverflow.com/a/32315573/7032856
             try
             {
-                return _serviceProvider.GetRequiredService(bundle.JobDetail.JobType) as IJob;
+                job = _serviceProvider.GetRequiredService(bundle.JobDetail.JobType) as IJob;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Exception creating job. Giving up and returning a do-nothing logging job.");
-                var job = new DummyJob();
-                return job;
+                const string message = "Exception creating job. Giving up and returning a do-nothing logging job.";
+                try
+                {
+                    logger?.LogError(ex, message);
+                }
+                catch
+                {
+                    Console.WriteLine(message);
+                }
             }
+            finally
+            {
+                job = new DummyJob();
+            }
+            return job;
         }
 
         public void ReturnJob(IJob job)
