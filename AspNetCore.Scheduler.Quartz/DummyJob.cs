@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Quartz;
 
@@ -8,6 +9,7 @@ namespace AspNetCore.Scheduler.Quartz
         public async Task Execute(IJobExecutionContext context)
         {
             await Task.Delay(100);
+            Console.WriteLine("Dummy job ran!");
         }
     }
 }

@@ -8,12 +8,13 @@ namespace AspNetCore.Scheduler.Quartz
 {
     public class JobFactory : IJobFactory
     {
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public JobFactory(IServiceProvider serviceProvider)
+        public JobFactory(IServiceProvider serviceProvider, ILogger logger)
         {
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
@@ -29,15 +30,12 @@ namespace AspNetCore.Scheduler.Quartz
                 const string message = "Exception creating job. Giving up and returning a do-nothing logging job.";
                 try
                 {
-                    logger?.LogError(ex, message);
+                    _logger?.LogError(ex, message);
                 }
                 catch
                 {
                     Console.WriteLine(message);
                 }
-            }
-            finally
-            {
                 job = new DummyJob();
             }
             return job;

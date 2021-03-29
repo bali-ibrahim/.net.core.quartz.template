@@ -48,7 +48,6 @@ namespace AspNetCore.Scheduler.Quartz
 
         private static ITrigger CreateTrigger(JobSchedule schedule)
         {
-            var test = TriggerBuilder.Create();
             return TriggerBuilder
                 .Create()
                 //.WithIdentity($"{schedule.JobType.FullName}.trigger")
